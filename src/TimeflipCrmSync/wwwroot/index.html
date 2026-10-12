@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TimeFlip → CRM mapping</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>TimeFlip → CRM</h1>
+    <p class="subtitle">Map each cube task to a CRM task, project or relation.</p>
+  </header>
+
+  <section id="status-card" class="card">
+    <div class="status-head">
+      <h2>Sync status</h2>
+      <div class="sync-controls">
+        <label class="inline" for="sync-days">Days back</label>
+        <input type="number" id="sync-days" min="1" step="1" value="1">
+        <button id="sync-now" type="button">Sync now</button>
+      </div>
+    </div>
+    <dl id="status-fields" class="status-grid"></dl>
+    <p class="note">
+      Scheduled passes only re-scan the last <span id="scheduled-lookback">—</span>.
+      Raise <em>days back</em> to pull in older entries or edits by hand.
+    </p>
+    <p id="sync-result" class="note" hidden></p>
+  </section>
+
+  <section class="card">
+    <div class="status-head">
+      <h2>Mapping rules</h2>
+      <button id="add-rule" type="button">Add rule</button>
+    </div>
+    <p class="note">
+      Rules are matched top to bottom and the first match wins. A task with no
+      matching rule is <span id="unmapped-behaviour">skipped</span>.
+    </p>
+    <table id="rules-table">
+      <thead>
+        <tr>
+          <th>TimeFlip task</th>
+          <th>CRM link</th>
+          <th>Billable</th>
+          <th>Description</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="rules-body"></tbody>
+    </table>
+    <p id="rules-empty" class="note" hidden>No rules yet. Add one to start syncing.</p>
+  </section>
+
+  <dialog id="rule-dialog">
+    <form id="rule-form" method="dialog">
+      <h2 id="dialog-title">Add rule</h2>
+
+      <label for="task-select">TimeFlip task</label>
+      <select id="task-select"></select>
+      <p class="hint">
+        <label class="inline">
+          <input type="checkbox" id="task-manual"> Enter a task name manually
+        </label>
+        — use this for a task the cube has not reported yet. Picking from the
+        list stores the task id, which survives renames.
+      </p>
+      <input type="text" id="task-name" placeholder="Task name as shown in TimeFlip" hidden>
+
+      <fieldset>
+        <legend>Link to in the CRM</legend>
+        <label class="inline"><input type="radio" name="link-kind" value="task" checked> Task</label>
+        <label class="inline"><input type="radio" name="link-kind" value="project"> Project</label>
+        <label class="inline"><input type="radio" name="link-kind" value="relation"> Relation</label>
+      </fieldset>
+
+      <label for="link-search" id="link-label">CRM task</label>
+      <input type="search" id="link-search" placeholder="Search by name…" autocomplete="off">
+      <select id="link-select"></select>
+      <p class="hint">
+        <span id="link-status">Type to search the CRM.</span>
+        A task brings its project and relation; a project brings its relation.
+        <a href="#" id="refresh-lists">Refresh</a>
+      </p>
+
+      <fieldset>
+        <legend>Billable</legend>
+        <label class="inline"><input type="radio" name="billable" value=""> CRM default</label>
+        <label class="inline"><input type="radio" name="billable" value="true"> Yes</label>
+        <label class="inline"><input type="radio" name="billable" value="false"> No</label>
+      </fieldset>
+
+      <label for="description">Description template</label>
+      <input type="text" id="description" placeholder="{task} ({date})" maxlength="1000">
+      <p class="hint">
+        Placeholders: <code>{task}</code>, <code>{date}</code>.
+        Preview: <span id="description-preview">—</span>
+      </p>
+
+      <ul id="form-errors" class="errors" hidden></ul>
+
+      <div class="actions">
+        <button type="button" id="cancel-rule" class="secondary">Cancel</button>
+        <button type="button" id="save-rule">Save</button>
+      </div>
+    </form>
+  </dialog>
+
+  <p id="banner" class="banner" hidden></p>
+
+  <script src="app.js"></script>
+</body>
+</html>

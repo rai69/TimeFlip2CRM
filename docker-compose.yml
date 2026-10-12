@@ -1,0 +1,24 @@
+services:
+  timeflip-crm-sync:
+    build: .
+    image: timeflip-crm-sync:latest
+    container_name: timeflip-crm-sync
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - sync-state:/data
+    environment:
+      DOTNET_ENVIRONMENT: Production
+    ports:
+      # 8080 on the host is taken by timeflip-moneybird-sync.
+      - "8081:8080"
+    healthcheck:
+      test: ["CMD", "dotnet", "TimeflipCrmSync.dll", "--healthcheck"]
+      interval: 30s
+      timeout: 6s
+      start_period: 30s
+      retries: 3
+
+volumes:
+  sync-state:
